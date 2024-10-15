@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kaniko
+  namespace: mlops
+spec:
+  params:
+    - name: IMAGE
+      description: Name (reference) of the image to build.
+  steps:
+    - name: build-and-push
+      image: gcr.io/kaniko-project/executor:latest
+      args:
+         - "--dockerfile=Dockerfile"
+         - "--context=dir://workspace"
+         - "--destination=$(params.IMAGE)"

@@ -1,0 +1,13 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: mlops-pipeline-run
+  namespace: mlops
+spec:
+  pipelineRef:
+    name: mlops-pipeline
+  params:
+    - name: git-url
+      value: https://github.com/strangemachinery/mlops-gitops-pipeline.git
+    - name: git-revision
+      value: main

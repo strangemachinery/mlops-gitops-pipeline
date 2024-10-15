@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: train-ml-model
+  namespace: mlops
+spec:
+  results:
+    - name: model-version
+      description: The version of the trained model
+  steps:
+    - name: train
+      image: python:3.12
+      script: |
+        #!bin/bash
+        set -e
+        pip install -r requirements.txt
+        export MLFLOW_TRACKING_URI=http://mlflow.mlops.svc.cluster.local
+        pip install mlflow
+        python src/model/train.py
+        echo -n $(mlflow runs list --experiment-id 0 -v | tail -n 1 | awk '{print $4}') > $(results.model-version.path)

@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: ml-training-pipeline
+  namespace: mlops
+spec:
+  params:
+    - name: git-url
+      type: string
+      description: Git repository URL
+    - name: git-revision
+      type: string
+      description: Git revision to use
+      default: "main"
+  tasks:
+    - name: fetch-repository
+      taskRef:
+        name: git-clone
+      params: 
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+    - name: run-tests
+      runAfter:
+        - fetch-repository
+      taskRef:
+        name: run-python-tests
+    - name: train-model
+      runAfter:
+        - fetch-repository
+      taskRef:
+        name: train-ml-model
+    - name: build-push-image
+      runAfter:
+        - train-model
+      taskRef:
+        name: kaniko
+      params:
+        - name: IMAGE
+          value: localhost:5000/mlops-model:$(tasks.train-model.results.model-version)

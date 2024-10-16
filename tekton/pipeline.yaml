@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: ml-training-pipeline
+  name: mlops-pipeline
   namespace: mlops
 spec:
   params:

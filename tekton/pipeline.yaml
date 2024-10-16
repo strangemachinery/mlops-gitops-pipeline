@@ -4,6 +4,8 @@ metadata:
   name: mlops-pipeline
   namespace: mlops
 spec:
+  workspaces:
+    - name: shared-workspace
   params:
     - name: git-url
       type: string
@@ -16,6 +18,9 @@ spec:
     - name: fetch-repository
       taskRef:
         name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
       params: 
         - name: url
           value: $(params.git-url)
@@ -26,16 +31,14 @@ spec:
         - fetch-repository
       taskRef:
         name: run-python-tests
+      workspaces:
+        - name: source
+          workspace: shared-workspace
     - name: train-model
       runAfter:
-        - fetch-repository
+        - run-tests
       taskRef:
         name: train-ml-model
-    - name: build-push-image
-      runAfter:
-        - train-model
-      taskRef:
-        name: kaniko
-      params:
-        - name: IMAGE
-          value: localhost:5000/mlops-model:$(tasks.train-model.results.model-version)
+      workspaces:
+        - name: source
+          workspace: shared-workspace

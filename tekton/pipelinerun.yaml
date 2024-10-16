@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: PipelineRun
 metadata:
   name: mlops-pipeline-run
@@ -11,3 +11,12 @@ spec:
       value: https://github.com/strangemachinery/mlops-gitops-pipeline.git
     - name: git-revision
       value: main
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
